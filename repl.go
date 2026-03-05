@@ -14,17 +14,28 @@ func cleanInput(text string) []string {
 }
 
 func startRepl() {
-	prefix := "Pokedex > "
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Printf("%s", prefix)
+		fmt.Print("Pokedex > ")
+		scanner.Scan()
 		text := scanner.Text()
 		cleanText := cleanInput(text)
 		if len(cleanText) == 0 {
 			continue
 		}
 
-		command := cleanText[0]
-		fmt.Printf("Your command was: %s\n", command)
+		commandName := cleanText[0]
+		command, exists := getCommands()[commandName]
+
+		if exists {
+			err := command.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
+			continue
+		} else {
+			fmt.Println("Unknown command")
+			continue
+		}
 	}
 }
